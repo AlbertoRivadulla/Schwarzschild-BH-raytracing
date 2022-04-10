@@ -29,6 +29,9 @@ struct PositionSph
     }
 };
 
+std::ostream& operator<<(std::ostream& os, const DirectionSph dir);
+std::ostream& operator<<(std::ostream& os, const PositionSph pos);
+
 // Function to compute the angles for a point in spherical coordinates
 DirectionSph computeAnglesFromxyz( float x, float y, float z );
 

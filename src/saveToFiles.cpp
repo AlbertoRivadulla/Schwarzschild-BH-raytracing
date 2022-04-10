@@ -1,5 +1,22 @@
 #include "saveToFiles.h"
 
+// Print method for the PixelRGB struct
+std::ostream& operator<<(std::ostream& os, const PixelRGB pixel)
+{
+    os << "RGB = (" << pixel.R << ", " << pixel.G << ", " << pixel.B << ")";
+    return os;
+}
+// Method for assigning values to a PixelRGB struct with the >> operator
+std::ifstream& operator>>(std::ifstream &in, PixelRGB& pixel)
+{
+    in >> pixel.R;
+    in >> pixel.G;
+    in >> pixel.B;
+
+    // in >> pixel.R >> pixel.G >> pixel.B;
+    return in;
+}
+
 // Save a the color data in a frame buffer to a ppm file. The data must be given as
 // a vector of integers, from 0 to 255, with the given amount of chanels per pixel.
 void saveToPpm(std::string fileName, std::vector<int> frameBuffer, int width, int height, int channels)
@@ -47,4 +64,63 @@ void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName
 
     // close the file
     fileStream.close();
+}
+
+// Function to load the data from a ppm file
+ImageRGB loadFromPpm(std::string fileName)
+{
+    // Open the file
+    // std::ifstream file(fileName.c_str());
+    std::ifstream file;
+    file.open(fileName.c_str(), std::ifstream::in);
+    if (!file.is_open())
+    {
+        std::cout << "Failed to open the file " << fileName << '\n';
+    }
+
+    // Read the preamble
+    std::string line;
+    // The first line is discarded
+    std::getline(file, line);
+    // Get the width and height of the image from the second line
+    int width, height;
+    std::getline(file, line);
+    std::stringstream ss;       // Convert the line to a stringstream
+    ss << line;
+    ss >> width >> height;      // Get the width and height from this
+    // The third line is discarded
+    std::getline(file, line);
+
+    // Create a vector with the pixels
+    std::vector<PixelRGB> pixels ( width * height );
+    // Define some auxiliary variables for reading the pixels
+    char c; // Variable to read each value, which ranges from 0 to 255 (4 bits, the size of a char)
+    int red = -1, green = -1, blue = -1; // Values of the colors in the current pixel
+    PixelRGB pixel ( -1, -1, -1 );
+    int rgbCount = 0; // Counter, that will become 3 when one entire pixel has been read
+    // Iterate over the different pixels
+    for (int i = 0; i < width; ++i)
+    {
+        for (int j = 0; j < height; ++j)
+        {
+            // Read the red value
+            file >> c;
+            red = (int)(unsigned char) c;
+            // Read the green value
+            file >> c;
+            green = (int)(unsigned char) c;
+            // Read the blue value
+            file >> c;
+            blue = (int)(unsigned char) c;
+
+            // Store the values of the colors in the current pixel in the image
+            pixels[width * j + i] = PixelRGB( red, green, blue );
+        }
+    }
+
+    // Close the file
+    file.close();
+
+    // Construct the image struct and return it
+    return ImageRGB(pixels, width, height);
 }

@@ -9,17 +9,6 @@
 #include "rungeKutta.h"
 #include "traceRays.h"
 
-// define the functions that appear in the differential equations
-float f1( float y1, float y2, float t )
-{
-    return y2;
-}
-
-float f2( float y1, float y2, float t )
-{
-    return - 0.01 * y2 - 9.81;
-}
-
 int main()
 {
     // Get the time of the beginning of the execution
@@ -34,6 +23,15 @@ int main()
     // Compute a single frame
     computeFrame(PositionSph( 2., M_PI / 2., 0. ), DirectionSph(0., 0.), 200, 100, 45.);
 
+    // Read the data from the file
+    ImageRGB image = loadFromPpm("../resources/fg.ppm");
+
+    for (int i = 0; i < 10; ++i)
+    {
+        std::cout << image.pixels[i] << '\n';
+    }
+    std::cout << image.width << ' ' << image.height;
+
     // Get the time of the end of the execution
     auto t1 {std::chrono::high_resolution_clock::now()};
     // Compute the difference between the two times
@@ -42,7 +40,7 @@ int main()
     // In order to get the duration in seconds, write simply
     // std::chrono::duration<double> ... ;
     // Print the duration of execution
-    std::cout << "Duration of execution: " << duration.count() << " ms\n";
+    std::cout << "\n\nDuration of execution: " << duration.count() << " ms\n";
 
     return 0;
 }

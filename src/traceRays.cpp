@@ -1,6 +1,19 @@
 #include "traceRays.h"
 #include "saveToFiles.h"
 
+// Output stream operator for the structs for the position and direction in
+// spherical coordinates
+std::ostream& operator<<(std::ostream& os, const DirectionSph dir)
+{
+    os << "Theta = " << dir.theta << ", Phi = " << dir.phi;
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const PositionSph pos)
+{
+    os << "r = " << pos.r << ", Theta = " << pos.theta << ", Phi = " << pos.phi;
+    return os;
+}
+
 // Function to compute the angles for a point in spherical coordinates
 DirectionSph computeAnglesFromxyz( float x, float y, float z )
 {
