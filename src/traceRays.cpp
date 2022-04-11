@@ -1,5 +1,4 @@
 #include "traceRays.h"
-#include "saveToFiles.h"
 
 // Output stream operator for the structs for the position and direction in
 // spherical coordinates
@@ -41,6 +40,17 @@ DirectionSph computeAnglesFromxyz( float x, float y, float z )
     return DirectionSph( theta, phi );
 }
 
+// Function to get the color value of an image in a given angle
+PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir )
+{
+    // Map the horizontal direction (0, w) to (0, 2Pi) in phi
+    int ix = (int)( dir.phi / ( 2. * M_PI ) * (image.width - 1) );
+    // Map the vertical direction (0, h) to (0, Pi) in theta
+    int iy = (int)( dir.theta / M_PI * (image.height - 1) );
+
+    return image.pixels[ image.width * iy + ix ];
+}
+
 //=====================================================
 //  Propagate a ray backwards from the camera, in a given direction
 //=====================================================
@@ -80,14 +90,15 @@ DirectionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, Direction
 //=====================================================
 //  Propagate all the rays backwards in a given frame
 //=====================================================
-void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov)
+void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov, ImageRGB background)
 {
     // Compute z_0 (distance from the camera point to the screen) from the field of view.
     // The field of view angle is given in degrees.
     float z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
 
     // Vector to store the angles obtained as a result of the propagation of the rays
-    std::vector<float> angles ( width * height * 2, 0 );
+    // std::vector<float> angles ( width * height * 2, 0 );
+    std::vector <DirectionSph> angles (width * height);
 
     // Iterate through the entire frame
     for (int ix = 0; ix < width; ++ix)
@@ -105,28 +116,37 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
             DirectionSph resultDir = traceRayBack( cameraPos, viewDir, rayDir );
 
             // Store these in the auxiliary vector
-            angles[ 2 * (width * iy + ix) ] = resultDir.theta;
-            angles[ 2 * (width * iy + ix) + 1 ] = resultDir.phi;
+            // angles[ 2 * (width * iy + ix) ] = resultDir.theta;
+            // angles[ 2 * (width * iy + ix) + 1 ] = resultDir.phi;
+
+            angles[ width * iy + ix ] = rayDir;
         }
     }
 
     /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     // Test output
 
-    // Convert the angles to the appropriate range
-    std::vector<int> colors ( width * height * 3, 0 );
+    // Make an image from the background
+    ImageRGB outImage(width, height);
     for (int i = 0; i < width * height; ++i)
     {
-        colors[3 * i] = (int)( angles[2 * i] / M_PI * 255. );
-        colors[3 * i + 1] = (int)(( angles[2 * i + 1] + M_PI ) / ( 2. * M_PI ) * 255. );
+        outImage.pixels[i] = mapDirectionToImage(background, angles[i]);
     }
+    // Write the image to a file
+    saveToPpm("out.ppm", outImage);
 
-    // Store these values in an image
-    saveToPpm("out.ppm", colors, width, height, 3);
-
+    // // Convert the angles to the appropriate range
+    // std::vector<int> colors ( width * height * 3, 0 );
     // for (int i = 0; i < width * height; ++i)
     // {
-    //     std::cout << angles[2*i] << ' ' << angles[2*i+1] << '\n';
-    //     std::cout << colors[3*i] << ' ' << colors[3*i+1] << ' ' << colors[ 3*i+2 ] << '\n';
+    //     colors[3 * i] = (int)( angles[2 * i] / M_PI * 255. );
+    //     colors[3 * i + 1] = (int)(( angles[2 * i + 1] + M_PI ) / ( 2. * M_PI ) * 255. );
     // }
+    //
+    // // Store these values in an image
+    // saveToPpm("out.ppm", colors, width, height, 3);
 }

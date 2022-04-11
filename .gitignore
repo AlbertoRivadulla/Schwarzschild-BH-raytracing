@@ -1,4 +1,4 @@
 compile_commands.json
 build
-./resources/fg.pdf
-./resources/bg.pdf
+resources/fg.pdf
+resources/bg.pdf

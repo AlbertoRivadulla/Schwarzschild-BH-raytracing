@@ -1,4 +1,4 @@
-#include "saveToFiles.h"
+#include "ioFiles.h"
 
 // Print method for the PixelRGB struct
 std::ostream& operator<<(std::ostream& os, const PixelRGB pixel)
@@ -19,7 +19,7 @@ std::ifstream& operator>>(std::ifstream &in, PixelRGB& pixel)
 
 // Save a the color data in a frame buffer to a ppm file. The data must be given as
 // a vector of integers, from 0 to 255, with the given amount of chanels per pixel.
-void saveToPpm(std::string fileName, std::vector<int> frameBuffer, int width, int height, int channels)
+void saveToPpm(std::string fileName, const std::vector<int>& frameBuffer, int width, int height, int channels)
 {
     // Open a file
     std::ofstream fileStream;
@@ -46,6 +46,23 @@ void saveToPpm(std::string fileName, std::vector<int> frameBuffer, int width, in
     fileStream.close();
 }
 
+// Save the data in a ImageRGB instance to a file
+void saveToPpm(std::string fileName, const ImageRGB& image)
+{
+    // Convert the data to a vector
+    std::vector<int> frameBuffer ( image.width * image.height * 3 , 0 );
+    int index = 0;
+    for (auto px : image.pixels)
+    {
+        frameBuffer[ index++ ] = px.R;
+        frameBuffer[ index++ ] = px.G;
+        frameBuffer[ index++ ] = px.B;
+    }
+
+    // Call the function inplemented for a vector of image data
+    saveToPpm( fileName, frameBuffer, image.width, image.height, 3 );
+}
+
 void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName)
 {
     // Open a file to output the results
@@ -62,7 +79,7 @@ void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName
         fileStream << std::to_string(data[data.size() - 1][i]) << '\n';
     }
 
-    // close the file
+    // Close the file
     fileStream.close();
 }
 
@@ -77,6 +94,9 @@ ImageRGB loadFromPpm(std::string fileName)
     {
         std::cout << "Failed to open the file " << fileName << '\n';
     }
+
+    // Set this to not skip spaces, which also carry a value
+    file >> std::noskipws;
 
     // Read the preamble
     std::string line;
@@ -99,9 +119,9 @@ ImageRGB loadFromPpm(std::string fileName)
     PixelRGB pixel ( -1, -1, -1 );
     int rgbCount = 0; // Counter, that will become 3 when one entire pixel has been read
     // Iterate over the different pixels
-    for (int i = 0; i < width; ++i)
+    for (int j = 0; j < height; ++j)
     {
-        for (int j = 0; j < height; ++j)
+        for (int i = 0; i < width; ++i)
         {
             // Read the red value
             file >> c;
@@ -114,7 +134,7 @@ ImageRGB loadFromPpm(std::string fileName)
             blue = (int)(unsigned char) c;
 
             // Store the values of the colors in the current pixel in the image
-            pixels[width * j + i] = PixelRGB( red, green, blue );
+            pixels[ width * j + i ] = PixelRGB( red, green, blue );
         }
     }
 

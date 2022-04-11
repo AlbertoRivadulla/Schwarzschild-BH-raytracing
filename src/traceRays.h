@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "rungeKutta.h"
+#include "ioFiles.h"
 
 struct DirectionSph
 {
@@ -11,8 +12,9 @@ struct DirectionSph
 
     DirectionSph(float thetaVal, float phiVal) :
         theta { thetaVal }, phi { phiVal }
-    {
-    }
+    {}
+    DirectionSph() : theta { 0 }, phi { 0 }
+    {}
 };
 
 struct PositionSph
@@ -25,8 +27,7 @@ struct PositionSph
     PositionSph(float rVal, float thetaVal, float phiVal) : 
         // r { rVal }, direction { DirectionSph(thetaVal, phiVal) }
         r { rVal }, theta { thetaVal }, phi { phiVal }
-    {
-    }
+    {}
 };
 
 std::ostream& operator<<(std::ostream& os, const DirectionSph dir);
@@ -34,6 +35,9 @@ std::ostream& operator<<(std::ostream& os, const PositionSph pos);
 
 // Function to compute the angles for a point in spherical coordinates
 DirectionSph computeAnglesFromxyz( float x, float y, float z );
+
+// Function to get the color value of an image in a given angle
+PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir );
 
 //=====================================================
 //  Propagate a ray backwards from the camera, in a given direction
@@ -48,7 +52,7 @@ DirectionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, Direction
 //=====================================================
 //  Propagate all the rays backwards in a given frame
 //=====================================================
-void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov);
+void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov, ImageRGB background);
 
 //=====================================================
 //  Equations that determine the evolution of a light ray

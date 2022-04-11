@@ -27,7 +27,7 @@ include_directories(${INCLUDE})
 set(SOURCES
     ${PROJECT_SOURCE_DIR}/main.cpp
     ${PROJECT_SOURCE_DIR}/src/rungeKutta.cpp
-    ${PROJECT_SOURCE_DIR}/src/saveToFiles.cpp
+    ${PROJECT_SOURCE_DIR}/src/ioFiles.cpp
     ${PROJECT_SOURCE_DIR}/src/traceRays.cpp
    )
 
