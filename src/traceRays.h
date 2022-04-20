@@ -42,7 +42,7 @@ PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir );
 //=====================================================
 //  Propagate a ray backwards from the camera, in a given direction
 //=====================================================
-DirectionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionSph rayDir);
+PositionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionSph rayDir);
 /* Input:
    - Position of the camera (only r).
    - View direction of the camera, relative to the angular direction.
@@ -67,44 +67,46 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
         - theta
         - p_theta
         - phi
-        - p_phi
+        - p_phi (this is constant)
 */
 
 // Equation for dr/dlambda
 inline float dr_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
-    // return ( 1. - 2. / r ) * p_r;
-    return - ( 1. - 2. / r ) * p_r;
+    return ( 1. - 2. / r ) * p_r;
+    // return p_r;
+    // return - ( 1. - 2. / r ) * p_r;
+    // return -1. * p_r;
 }
 // Equation for dp_r/dlambda
 inline float dp_r_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
     float sintheta = std::sin(theta);
+    return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r) - 1. / ( r * r * (1-2./r) * (1-2./r) ) - p_r * p_r / (r * r);
     // return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r);
-    return - ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r);
 }
 // Equation for dtheta/dlambda
 inline float dtheta_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
-    // return p_theta / (r * r);
-    return - p_theta / (r * r);
+    return p_theta / (r * r);
+    // return - p_theta / (r * r);
 }
 // Equation for dp_theta/dlambda
 inline float dp_theta_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
     float sintheta = std::sin(theta);
-    // return std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
-    return - std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
+    return std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
+    // return - std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
 }
 // Equation for dphi/dlambda
 inline float dphi_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
     float sintheta = std::sin(theta);
-    // return p_phi / ( r * r * sintheta * sintheta );
-    return - p_phi / ( r * r * sintheta * sintheta );
+    return p_phi / ( r * r * sintheta * sintheta );
+    // return - p_phi / ( r * r * sintheta * sintheta );
 }
 // Equation for dp_phi/dlambda
-// This is constant!
+// This quantity is a constant of movement!
 inline float dp_phi_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
 {
     return 0.;

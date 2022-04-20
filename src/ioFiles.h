@@ -50,6 +50,14 @@ struct ImageRGB
 void saveToPpm(std::string fileName, const std::vector<int>& frameBuffer, int width, int height, int channels = 3);
 void saveToPpm(std::string fileName, const ImageRGB& image);
 
+// Save data to a text file
+// In order to open and plot the output data in Mathematica, use:
+/*
+    table = Import["path/out.csv", "Table", "FieldSeparators" -> ";"]
+    ListPlot[table[[;; , ;; 2]], ImageSize -> Large]
+    ListPlot[table[[;; , ;; 3 ;; 2]], ImageSize -> Large]
+*/
+// To get the path, run "pwd" in the build directory.
 void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName);
 
 // Function to load the data from a ppm file

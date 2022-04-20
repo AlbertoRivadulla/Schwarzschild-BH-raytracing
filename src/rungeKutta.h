@@ -52,11 +52,11 @@ std::vector<std::vector<float>> solveRungeKutta4th2eq
 
 std::vector<std::vector<float>> solveRungeKutta4th5eqCustom
     (
-    float (*f1)(float, float, float),   // Equation for dy1/dt
-    float (*f2)(float, float, float),   // Equation for dy2/dt
-    float (*f3)(float, float, float),   // Equation for dy3/dt
-    float (*f4)(float, float, float),   // Equation for dy4/dt
-    float (*f5)(float, float, float),   // Equation for dy5/dt
+    float (*f1)(float, float, float, float, float, float, float),   // Equation for dy1/dt
+    float (*f2)(float, float, float, float, float, float, float),   // Equation for dy2/dt
+    float (*f3)(float, float, float, float, float, float, float),   // Equation for dy3/dt
+    float (*f4)(float, float, float, float, float, float, float),   // Equation for dy4/dt
+    float (*f5)(float, float, float, float, float, float, float),   // Equation for dy5/dt
     int n,                              // Number of steps
     float lambda0, float lambdaf,       // Range of values of the independent variable
     float y10, float y20, float y30,    // Initial conditions
