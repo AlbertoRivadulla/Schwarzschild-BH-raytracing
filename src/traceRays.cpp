@@ -14,16 +14,16 @@ std::ostream& operator<<(std::ostream& os, const PositionSph pos)
 }
 
 // Function to compute the angles for a point in spherical coordinates
-DirectionSph computeAnglesFromxyz( float x, float y, float z )
+DirectionSph computeAnglesFromxyz( double x, double y, double z )
 {
     // Compute the radius
-    float r = std::sqrt(x*x + y*y + z*z);
+    double r = std::sqrt(x*x + y*y + z*z);
 
     // Compute the angle theta
-    float theta = std::acos(z / r);
+    double theta = std::acos(z / r);
 
     // Compute the angle phi
-    float phi = 0;
+    double phi = 0;
     if ( x > 0 )
         phi = atan( y / x );
     else if ( x < 0 && y >= 0 )
@@ -34,8 +34,8 @@ DirectionSph computeAnglesFromxyz( float x, float y, float z )
         phi = M_PI / 2;
     else if ( x == 0 && y < 0 )
         phi = - M_PI / 2;
-    // else    // Case x == y == 0
-    //     phi = 0;
+    else    // Case x == y == 0
+        phi = 0;
 
     return DirectionSph( theta, phi );
 }
@@ -44,7 +44,7 @@ DirectionSph computeAnglesFromxyz( float x, float y, float z )
 PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir )
 {
     // Map the angle phi to the range (0, 2 Pi)
-    float phi = std::fmod( dir.phi, 2. * M_PI );
+    double phi = std::fmod( dir.phi, 2. * M_PI );
     if (phi < 0.)
     {
         phi = 2. * M_PI + phi;
@@ -55,9 +55,9 @@ PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir )
     }
 
     // Map the angle theta to the range (0, Pi)
-    // float theta = dir.theta > 0. ? dir.theta : 0.;
+    // double theta = dir.theta > 0. ? dir.theta : 0.;
     // if (theta > M_PI) theta = 0.;
-    float theta = std::fmod( dir.theta, 2. * M_PI );
+    double theta = std::fmod( dir.theta, 2. * M_PI );
     if (theta < 0.)
     {
         theta = 2. * M_PI + theta;
@@ -103,36 +103,43 @@ PositionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionS
 
     // Get the initial values of p_theta and p_phi from the direction of the ray
     // The conversions are written in page 193 of my notes
-    // float n_theta = std::cos( rayDir.theta - viewDir.theta );
-    // float n_theta = - std::sin( rayDir.theta - viewDir.theta ) * std::sin( rayDir.phi - viewDir.phi );
-    // float n_phi   = - std::sin( rayDir.theta - viewDir.theta ) * std::cos( rayDir.phi - viewDir.phi );
+    // double n_theta = std::cos( rayDir.theta - viewDir.theta );
+    // double n_theta = - std::sin( rayDir.theta - viewDir.theta ) * std::sin( rayDir.phi - viewDir.phi );
+    // double n_phi   = - std::sin( rayDir.theta - viewDir.theta ) * std::cos( rayDir.phi - viewDir.phi );
     // rayDir.theta = M_PI;
-    float n_theta = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::sin( rayDir.phi - viewDir.phi );
-    float n_phi   = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::cos( rayDir.phi - viewDir.phi );
+    double n_theta = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::sin( rayDir.phi - viewDir.phi );
+    double n_phi   = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::cos( rayDir.phi - viewDir.phi );
     // Since I propagate the rays backwards, I change the sign of these
-    // float p_theta = - cameraPos.r * n_theta;
-    // float p_phi   = - cameraPos.r * std::sin(cameraPos.theta) * n_phi;
-    float p_theta = cameraPos.r * n_theta;
-    float p_phi   = cameraPos.r * std::sin(cameraPos.theta) * n_phi;
+    // double p_theta = - cameraPos.r * n_theta;
+    // double p_phi   = - cameraPos.r * std::sin(cameraPos.theta) * n_phi;
+    double p_theta = cameraPos.r * n_theta;
+    double p_phi   = cameraPos.r * std::sin(cameraPos.theta) * n_phi;
 
     // std::cout << p_theta << " --- " << p_phi << '\n';
 
     // Get the initial value of p_r from the two above
-    float p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1. - 2./cameraPos.r) );
-    // float p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1.) );
+    double p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1. - 2./cameraPos.r) );
+    // double p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1.) );
     // std::cout << "p_phi = ";
     // std::cout << p_phi << '\n';
     // std::cout << p_r << '\n';
 
     // Solve the differential equations backwards in time
     int n_steps = 20000;
-    std::vector<std::vector<float>> solution = solveRungeKutta4th5eqCustom(&dr_dlambda, &dp_r_dlambda, &dtheta_dlambda, &dp_theta_dlambda, &dphi_dlambda,
-                                                                           n_steps, 0., -60., cameraPos.r, p_r, cameraPos.theta, p_theta, cameraPos.phi, p_phi);
+    std::vector<std::vector<double>> solution = solveRungeKutta4th5eqCustom(&dr_dlambda, &dp_r_dlambda, &dtheta_dlambda, &dp_theta_dlambda, &dphi_dlambda,
+                                                                           n_steps, 0., -200., cameraPos.r, p_r, cameraPos.theta, p_theta, cameraPos.phi, p_phi);
 
-    // std::cout << solution[2][n_steps-1] << ' ' << solution[4][n_steps-1] << ' ' << std::fmod(solution[4][n_steps-1], 2*M_PI) << '\n';
-
-    // std::vector<std::vector<float>> output { solution[0], solution[1], solution[3], solution[5] };
-    // outputDataToFile(output, "out.csv");
+    // // std::cout << solution[2][n_steps-1] << ' ' << solution[4][n_steps-1] << ' ' << std::fmod(solution[4][n_steps-1], 2*M_PI) << '\n';
+    // // std::vector<std::vector<double>> output { solution[0], solution[1], solution[3], solution[5] };
+    // // outputDataToFile(output, "out.csv");
+    // float thr = 0.001;
+    // if (fabs(rayDir.phi) < thr && rayDir.theta < M_PI + thr && rayDir.theta > M_PI - thr)
+    // {
+    //     std::cout << "algo\n";
+    //     // std::vector<std::vector<double>> output { solution[0], solution[1], solution[3], solution[5] };
+    //     // outputDataToFile(output, "out.csv");
+    //     outputDataToFile(solution, "out.csv");
+    // }
 
     // Return the final value of the ray angle
     // The angles are the variables solution[2] and solution[4]
@@ -145,15 +152,15 @@ PositionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionS
 //=====================================================
 //  Propagate all the rays backwards in a given frame
 //=====================================================
-void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov, ImageRGB background)
+void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, double thetaFov, ImageRGB background)
 {
     // Compute z_0 (distance from the camera point to the screen) from the field of view.
     // The field of view angle is given in degrees.
-    float z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
+    double z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
 
     // Vector to store the angles obtained as a result of the propagation of the rays
-    std::vector<float> anglesaux ( width * height * 2, 0. );
-    std::vector<float> raux ( width * height , 0. );
+    std::vector<double> anglesaux ( width * height * 2, 0. );
+    std::vector<double> raux ( width * height , 0. );
     std::vector <DirectionSph> angles (width * height);
 
     // Iterate through the entire frame
@@ -162,8 +169,8 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
         for (int iy = 0; iy < height; ++iy)
         {
             // Compute the x and y coordinates of the pixel
-            float x = -width / 2. + (float)ix; 
-            float y = -height / 2. + (float)iy; 
+            double x = -width / 2. + (double)ix; 
+            double y = -height / 2. + (double)iy; 
 
             // Get the angles from these x, y and z coordinates
             DirectionSph rayDir = computeAnglesFromxyz( x, y, -z_0 );
@@ -179,6 +186,24 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
 
             // std::cout << resultDir << '\n';
             angles[ width * iy + ix ] = DirectionSph(resultPos.theta, resultPos.phi);
+
+            if (ix > width*0.44 && ix < width * 0.56 && iy < height*0.56 && iy > height*0.44)
+            {
+                double n_theta = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::sin( rayDir.phi - viewDir.phi );
+                double n_phi   = - std::sin( M_PI - rayDir.theta + viewDir.theta ) * std::cos( rayDir.phi - viewDir.phi );
+                double p_theta = cameraPos.r * n_theta;
+                double p_phi   = cameraPos.r * std::sin(cameraPos.theta) * n_phi;
+                double p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1. - 2./cameraPos.r) );
+
+                // std::cout << "---\n";
+                // std::cout << ix << ' ' << iy << '\n';
+                // std::cout << viewDir << '\n';
+                // std::cout << rayDir << '\n';
+                // std::cout << x << ' ' << y << '\n';
+                // std::cout << n_theta << ' ' << n_phi << '\n';
+                // std::cout << p_theta << ' ' << p_phi <<  ' ' << p_r << '\n';
+                // std::cout << raux[ width * iy + ix ] << '\n';
+            }
         }
         if (ix % 100 == 0) std::cout << ix << " / " << width << "\n";
     }
@@ -218,7 +243,7 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
         else
         {
             // Map the angle phi to the range (0, 2 Pi)
-            float phi = std::fmod( anglesaux[2*i+1], 2. * M_PI );
+            double phi = std::fmod( anglesaux[2*i+1], 2. * M_PI );
             if (phi < 0.)
             {
                 phi = 2. * M_PI + phi;

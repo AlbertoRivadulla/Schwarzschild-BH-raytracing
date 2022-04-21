@@ -63,7 +63,7 @@ void saveToPpm(std::string fileName, const ImageRGB& image)
     saveToPpm( fileName, frameBuffer, image.width, image.height, 3 );
 }
 
-void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName)
+void outputDataToFile(std::vector<std::vector<double>> data, std::string fileName)
 {
     // Open a file to output the results
     std::ofstream fileStream;

@@ -58,7 +58,7 @@ void saveToPpm(std::string fileName, const ImageRGB& image);
     ListPlot[table[[;; , ;; 3 ;; 2]], ImageSize -> Large]
 */
 // To get the path, run "pwd" in the build directory.
-void outputDataToFile(std::vector<std::vector<float>> data, std::string fileName);
+void outputDataToFile(std::vector<std::vector<double>> data, std::string fileName);
 
 // Function to load the data from a ppm file
 ImageRGB loadFromPpm(std::string fileName);

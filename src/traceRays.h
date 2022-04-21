@@ -7,10 +7,10 @@
 
 struct DirectionSph
 {
-    float theta;
-    float phi;
+    double theta;
+    double phi;
 
-    DirectionSph(float thetaVal, float phiVal) :
+    DirectionSph(double thetaVal, double phiVal) :
         theta { thetaVal }, phi { phiVal }
     {}
     DirectionSph() : theta { 0 }, phi { 0 }
@@ -19,12 +19,12 @@ struct DirectionSph
 
 struct PositionSph
 {
-    float r;
-    float theta;
-    float phi;
+    double r;
+    double theta;
+    double phi;
     // DirectionSph direction;
 
-    PositionSph(float rVal, float thetaVal, float phiVal) : 
+    PositionSph(double rVal, double thetaVal, double phiVal) : 
         // r { rVal }, direction { DirectionSph(thetaVal, phiVal) }
         r { rVal }, theta { thetaVal }, phi { phiVal }
     {}
@@ -34,7 +34,7 @@ std::ostream& operator<<(std::ostream& os, const DirectionSph dir);
 std::ostream& operator<<(std::ostream& os, const PositionSph pos);
 
 // Function to compute the angles for a point in spherical coordinates
-DirectionSph computeAnglesFromxyz( float x, float y, float z );
+DirectionSph computeAnglesFromxyz( double x, double y, double z );
 
 // Function to get the color value of an image in a given angle
 PixelRGB mapDirectionToImage( const ImageRGB& image, const DirectionSph& dir );
@@ -52,7 +52,7 @@ PositionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionS
 //=====================================================
 //  Propagate all the rays backwards in a given frame
 //=====================================================
-void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, float thetaFov, ImageRGB background);
+void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int height, double thetaFov, ImageRGB background);
 
 //=====================================================
 //  Equations that determine the evolution of a light ray
@@ -71,7 +71,7 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
 */
 
 // Equation for dr/dlambda
-inline float dr_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dr_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     return ( 1. - 2. / r ) * p_r;
     // return p_r;
@@ -79,35 +79,35 @@ inline float dr_dlambda( float t, float r, float p_r, float theta, float p_theta
     // return -1. * p_r;
 }
 // Equation for dp_r/dlambda
-inline float dp_r_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dp_r_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
-    float sintheta = std::sin(theta);
+    double sintheta = std::sin(theta);
     return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r) - 1. / ( r * r * (1-2./r) * (1-2./r) ) - p_r * p_r / (r * r);
     // return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r);
 }
 // Equation for dtheta/dlambda
-inline float dtheta_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dtheta_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     return p_theta / (r * r);
     // return - p_theta / (r * r);
 }
 // Equation for dp_theta/dlambda
-inline float dp_theta_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dp_theta_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
-    float sintheta = std::sin(theta);
+    double sintheta = std::sin(theta);
     return std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
     // return - std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
 }
 // Equation for dphi/dlambda
-inline float dphi_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dphi_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
-    float sintheta = std::sin(theta);
+    double sintheta = std::sin(theta);
     return p_phi / ( r * r * sintheta * sintheta );
     // return - p_phi / ( r * r * sintheta * sintheta );
 }
 // Equation for dp_phi/dlambda
 // This quantity is a constant of movement!
-inline float dp_phi_dlambda( float t, float r, float p_r, float theta, float p_theta, float phi, float p_phi )
+inline double dp_phi_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     return 0.;
 }

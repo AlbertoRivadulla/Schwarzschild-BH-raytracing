@@ -38,23 +38,23 @@ int main()
     // std::cout << mapDirectionToImage( image, DirectionSph( M_PI/2., M_PI ) );
 
     // // Solve the system of differential equations
-    // std::vector<std::vector<float>> solution = solveRungeKutta4th2eq(&f1, &f2, 200, 0., 1000., 10., 600. * std::sin(60. * M_PI / 180.));
+    // std::vector<std::vector<double>> solution = solveRungeKutta4th2eq(&f1, &f2, 200, 0., 1000., 10., 600. * std::sin(60. * M_PI / 180.));
     // // Save the data to a file
     // outputDataToFile(solution, "output.csv");
 
     // Compute a single frame
-    // computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 200, 100, 45., background);
-    computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 100, 50, 45., background);
+    computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 50, 25, 45., background);
+    // computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 100, 50, 45., background);
     // computeFrame(PositionSph( 6., M_PI / 2., 0. ), DirectionSph(0., 0.), 20, 10, 45, background);
     // computeFrame(PositionSph( 20., M_PI / 2., M_PI ), DirectionSph(0., 0.), 400, 200, 80., background);
 
     // int width = 100;
     // int height = 50;
-    // float thetaFov = 45.;
-    // float z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
-    // float x = -width / 2.; 
+    // double thetaFov = 45.;
+    // double z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
+    // double x = -width / 2.; 
     // // Compute the x and y coordinates of the pixel
-    // float y = -height / 2.; 
+    // double y = -height / 2.; 
     // x = 0;
     // y = 0;
     // // Get the angles from these x, y and z coordinates
