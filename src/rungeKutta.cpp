@@ -20,9 +20,9 @@ std::vector<std::vector<double>> solveRungeKutta4th2eq
     (
     double (*f1)(double, double, double),   // Equation for dy1/dt
     double (*f2)(double, double, double),   // Equation for dy2/dt
-    int n,                              // Number of steps
-    double t0, double tf,                 // Range of values of the independent variable
-    double y10, double y20                // Initial conditions
+    int n,                                  // Number of steps
+    double t0, double tf,                   // Range of values of the independent variable
+    double y10, double y20                  // Initial conditions
     )
 {
     // Compute the step size
@@ -73,11 +73,11 @@ std::vector<std::vector<double>> solveRungeKutta4th5eqCustom
     double (*f3)(double, double, double, double, double, double, double),   // Equation for dy3/dt
     double (*f4)(double, double, double, double, double, double, double),   // Equation for dy4/dt
     double (*f5)(double, double, double, double, double, double, double),   // Equation for dy5/dt
-    int n,                              // Number of steps
-    double t0, double tf,                 // Range of values of the independent variable
-    double y10, double y20, double y30,    // Initial conditions
+    int n,                                                                  // Number of steps
+    double t0, double tf,                                                   // Range of values of the independent variable
+    double y10, double y20, double y30,                                     // Initial conditions
     double y40, double y50,
-    double p_phi                         // Value of p_phi (constant)
+    double p_phi                                                            // Value of p_phi (constant)
     )
 {
     // Compute the step size
@@ -96,6 +96,7 @@ std::vector<std::vector<double>> solveRungeKutta4th5eqCustom
         t[i] = t0 + i * h;
     }
 
+    // Value of r at which we consider that the ray is far away enough.
     double minr = 1000.;
 
     // Solve the system of differential equations
@@ -134,20 +135,16 @@ std::vector<std::vector<double>> solveRungeKutta4th5eqCustom
         y4[i+1] = y4[i] + (o1 + 2. * o2 + 2. * o3 + o4) * h / 6;
         y5[i+1] = y5[i] + (p1 + 2. * p2 + 2. * p3 + p4) * h / 6;
 
-        // std::cout << y3[i+1] << ' ' << y5[i+1] << '\n';
-
-        // std::cout << y1[i+1] << ' ';
         if (y1[i+1] < minr)
             minr = y1[i+1];
 
         // Check if the ray has gone inside the horizon
         // The coordinate r is y1
-        // Add a small threshold, since the system of equations is singular at r = 2
-        double threshold = 0.01;
+        // Add a small threshold, based on the number of steps, since the system of equations is singular at r = 2
+        // double threshold = 0.01;
+        double threshold = 2000. / n;
         if (y1[i+1] <= 2. + threshold)
         {
-            // std::cout << "dentro1\n";
-            // std::cout << y1[i+1] << '\n';
             // Set the last value of r to be less than 2.
             y1[n] = 1.;
             // Break the loop
@@ -157,21 +154,13 @@ std::vector<std::vector<double>> solveRungeKutta4th5eqCustom
         // Check if the r coordinate is large enough
         if (y1[i+1] > 100.)
         {
-            // std::cout << "Large r\n";
             // Set the last values of the angles to be the solutions
             y3[n] = y3[i+1];
             y5[n] = y5[i+1];
             // Break the loop
             break;
         }
-
-        // std::cout << y1[i] << ' ';
-        // std::cout << y3[i] << ' ';
-        // std::cout << y4[i] << ' ';
-        // std::cout << "--- ";
     }
-
-    // std::cout << "minimum r: " << minr << "\n";
 
     std::vector<std::vector<double>> solution { t, y1, y2, y3, y4, y5 };
     return solution;

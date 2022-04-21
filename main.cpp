@@ -19,8 +19,12 @@
 /*
    Features to implement:
         - Improve mapDirectionToImage() to use linear interpolation between pixels
-
-        - Solve the system of differential equations
+        - Modify the function traceRayBack to be able to have a viewDir different from (0, 0)
+          as not it is not correct.
+        - The custom Runge-Kutta solver must check if the ray has gone far enough
+          also when it goes around the BH several times. I think in this case the 
+          integration ends when the maximum value of the independent variable is
+          reached, but this should continue until the ray escapes.
 */
 //============================================================
 
@@ -34,33 +38,8 @@ int main()
     // ImageRGB background = loadFromPpm("../resources/fg.ppm");
     ImageRGB background = loadFromPpm("../resources/fg2.ppm");
 
-    // saveToPpm( "test.ppm", image );
-    // std::cout << mapDirectionToImage( image, DirectionSph( M_PI/2., M_PI ) );
-
-    // // Solve the system of differential equations
-    // std::vector<std::vector<double>> solution = solveRungeKutta4th2eq(&f1, &f2, 200, 0., 1000., 10., 600. * std::sin(60. * M_PI / 180.));
-    // // Save the data to a file
-    // outputDataToFile(solution, "output.csv");
-
     // Compute a single frame
     computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 50, 25, 45., background);
-    // computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 100, 50, 45., background);
-    // computeFrame(PositionSph( 6., M_PI / 2., 0. ), DirectionSph(0., 0.), 20, 10, 45, background);
-    // computeFrame(PositionSph( 20., M_PI / 2., M_PI ), DirectionSph(0., 0.), 400, 200, 80., background);
-
-    // int width = 100;
-    // int height = 50;
-    // double thetaFov = 45.;
-    // double z_0 = width / ( 2. * std::tan(thetaFov / 2. * M_PI / 180.) );
-    // double x = -width / 2.; 
-    // // Compute the x and y coordinates of the pixel
-    // double y = -height / 2.; 
-    // x = 0;
-    // y = 0;
-    // // Get the angles from these x, y and z coordinates
-    // DirectionSph rayDir = computeAnglesFromxyz( x, y, -z_0 );
-    // std::cout << rayDir << '\n';
-    // PositionSph resultPos = traceRayBack( PositionSph( 4., M_PI / 2., 0. ), DirectionSph(0., 0.), rayDir );
 
     // Get the time of the end of the execution
     auto t1 {std::chrono::high_resolution_clock::now()};

@@ -74,36 +74,29 @@ void computeFrame(PositionSph cameraPos, DirectionSph viewDir, int width, int he
 inline double dr_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     return ( 1. - 2. / r ) * p_r;
-    // return p_r;
-    // return - ( 1. - 2. / r ) * p_r;
-    // return -1. * p_r;
 }
 // Equation for dp_r/dlambda
 inline double dp_r_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     double sintheta = std::sin(theta);
     return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r) - 1. / ( r * r * (1-2./r) * (1-2./r) ) - p_r * p_r / (r * r);
-    // return ( p_theta * p_theta + p_phi * p_phi / (sintheta * sintheta) ) / (r * r * r);
 }
 // Equation for dtheta/dlambda
 inline double dtheta_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     return p_theta / (r * r);
-    // return - p_theta / (r * r);
 }
 // Equation for dp_theta/dlambda
 inline double dp_theta_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     double sintheta = std::sin(theta);
     return std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
-    // return - std::cos(theta) / (r * r * sintheta * sintheta * sintheta) * p_phi * p_phi;
 }
 // Equation for dphi/dlambda
 inline double dphi_dlambda( double t, double r, double p_r, double theta, double p_theta, double phi, double p_phi )
 {
     double sintheta = std::sin(theta);
     return p_phi / ( r * r * sintheta * sintheta );
-    // return - p_phi / ( r * r * sintheta * sintheta );
 }
 // Equation for dp_phi/dlambda
 // This quantity is a constant of movement!

@@ -57,11 +57,11 @@ std::vector<std::vector<double>> solveRungeKutta4th5eqCustom
     double (*f3)(double, double, double, double, double, double, double),   // Equation for dy3/dt
     double (*f4)(double, double, double, double, double, double, double),   // Equation for dy4/dt
     double (*f5)(double, double, double, double, double, double, double),   // Equation for dy5/dt
-    int n,                              // Number of steps
-    double lambda0, double lambdaf,       // Range of values of the independent variable
-    double y10, double y20, double y30,    // Initial conditions
+    int n,                                                                  // Number of steps
+    double t0, double tf,                                                   // Range of values of the independent variable
+    double y10, double y20, double y30,                                     // Initial conditions
     double y40, double y50,
-    double p_phi                         // Value of p_phi (constant)
+    double p_phi                                                            // Value of p_phi (constant)
     );
 
 #endif
