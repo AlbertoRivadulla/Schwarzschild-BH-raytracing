@@ -94,7 +94,7 @@ PositionSph traceRayBack(PositionSph cameraPos, DirectionSph viewDir, DirectionS
     double p_r = std::sqrt( 1. - ( (n_theta * n_theta) + (n_phi * n_phi) ) / (1. - 2./cameraPos.r) );
 
     // Solve the differential equations backwards in time
-    int n_steps = 20000;
+    int n_steps = 2000;
     std::vector<std::vector<double>> solution = solveRungeKutta4th5eqCustom(&dr_dlambda, &dp_r_dlambda, &dtheta_dlambda, &dp_theta_dlambda, &dphi_dlambda,
                                                                            n_steps, 0., -200., cameraPos.r, p_r, cameraPos.theta, p_theta, cameraPos.phi, p_phi);
 

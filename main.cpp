@@ -35,11 +35,15 @@ int main()
     auto t0 {std::chrono::high_resolution_clock::now()};
 
     // Read the data from the file
-    // ImageRGB background = loadFromPpm("../resources/fg.ppm");
-    ImageRGB background = loadFromPpm("../resources/fg2.ppm");
+    ImageRGB background = loadFromPpm("../resources/fg.ppm");
 
-    // Compute a single frame
-    computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 50, 25, 45., background);
+    // Compute a single frame.
+    // The first two arguments are the camera position and direction with respect
+    // to the black hole.
+    // The 3rd and 4th arguments are the resolution of the image.
+    // The 5th argument is the field of view angle.
+    computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 1600, 1000, 45., background);
+    // computeFrame(PositionSph( 40., M_PI / 2., 0. ), DirectionSph(0., 0.), 160, 100, 45., background);
 
     // Get the time of the end of the execution
     auto t1 {std::chrono::high_resolution_clock::now()};
